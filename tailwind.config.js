@@ -9,34 +9,38 @@ export default {
     extend: {
       colors: {
         crm: {
-          bg: '#0f111a',
-          bgLight: '#f8fafc',
-          card: '#181b26',
-          cardLight: '#ffffff',
-          cardHover: '#202434',
-          border: '#262a3b',
-          borderLight: '#e2e8f0',
-          text: '#f1f5f9',
-          textLight: '#0f172a',
-          secondary: '#94a3b8',
-          secondaryLight: '#64748b',
-          muted: '#64748b',
+          bg: '#0b0f19',        // Deep elegant charcoal slate
+          bgLight: '#f9fafb',   // Pure clean porcelain slate
+          card: '#111827',      // Tailored card background
+          cardLight: '#ffffff', // Crisp white card
+          cardHover: '#1f2937',
+          border: '#1f2937',    // Subtle dark border
+          borderLight: '#e5e7eb', // Soft light border
+          text: '#f3f4f6',      // Soft high-contrast white
+          textLight: '#111827', // Slate 900
+          secondary: '#9ca3af', // Balanced muted gray
+          secondaryLight: '#6b7280',
+          muted: '#6b7280',
         },
         brand: {
-          warm: '#ea580c', // Soft warm terracotta / fire
-          gold: '#d97706', // Subtle amber gold
+          warm: '#d97706',      // Refined amber ember
+          dark: '#b45309',
           light: '#fef3c7',
         },
         payer: {
-          DEFAULT: '#10b981', // Clean emerald
-          light: '#34d399',
-          dark: '#059669',
+          DEFAULT: '#059669',   // Refined executive emerald
+          light: '#10b981',
+          dark: '#047857',
         },
         wsp: {
-          DEFAULT: '#16a34a',
-          dark: '#15803d',
-          light: '#22c55e',
+          DEFAULT: '#15803d',   // Professional dark forest WhatsApp
+          light: '#16a34a',
         }
+      },
+      boxShadow: {
+        'soft': '0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.03)',
+        'premium': '0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.03)',
+        'dark-premium': '0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.2)',
       }
     },
   },
