@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
   X, 
   CheckCircle2, 
@@ -10,7 +10,9 @@ import {
   FileCheck, 
   AlertTriangle,
   CheckSquare,
-  Square
+  Square,
+  Sparkles,
+  Lock
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
@@ -24,7 +26,7 @@ export const ReconciliationModal = ({
 
   const isAlreadyPayer = currentLead.status === 'PAYER';
 
-  // State for form
+  // Form states
   const [paymentMethod, setPaymentMethod] = useState(
     currentLead.operational.preferredPaymentMethod || 'YAPE'
   );
@@ -42,8 +44,8 @@ export const ReconciliationModal = ({
     currentLead.activeOrder?.total?.toFixed(2) || (currentLead.id === 'lead-1' ? '53.00' : '183.00')
   );
   
-  // By default, activate the verification certification to make it frictionless, with clear visible toggle!
-  const [verifiedBySeller, setVerifiedBySeller] = useState(true);
+  // Explicit compliance certification for KPI L3 (Starts unchecked so the user actively validates the rule)
+  const [verifiedBySeller, setVerifiedBySeller] = useState(false);
   const [validationError, setValidationError] = useState('');
 
   const handleMethodChange = (method) => {
@@ -56,7 +58,7 @@ export const ReconciliationModal = ({
 
   const handleConfirm = () => {
     if (!verifiedBySeller && !isAlreadyPayer) {
-      setValidationError('Por favor activa la casilla de certificación para validar el cumplimiento de auditoría UNT.');
+      setValidationError('¡Atención! Por regla del KPI L3, debes certificar la validación en el recuadro del Paso 5 para poder cambiar a PAYER.');
       return;
     }
     if (!operationCode.trim()) {
@@ -111,7 +113,7 @@ export const ReconciliationModal = ({
                 </span>
               </div>
               <p className="text-xs text-slate-500 dark:text-crm-secondary">
-                Lead: <strong className="text-slate-900 dark:text-white">{currentLead.name}</strong> • Canal Preferido: {currentLead.operational.preferredPaymentMethod}
+                Lead: <strong className="text-slate-900 dark:text-white">{currentLead.name}</strong> • Canal: {currentLead.operational.preferredPaymentMethod}
               </p>
             </div>
           </div>
@@ -232,7 +234,7 @@ export const ReconciliationModal = ({
               {/* Real Source Selector */}
               <div>
                 <label className="text-xs font-bold text-slate-600 dark:text-crm-secondary uppercase tracking-wider block mb-1.5">
-                  2. Fuente Real de Validación
+                  2. Fuente Real de Validación (Cuenta Central del Negocio)
                 </label>
                 <select
                   value={realSource}
@@ -295,40 +297,63 @@ export const ReconciliationModal = ({
                 </div>
               )}
 
-              {/* INTERACTIVE CERTIFICATION CARD (Prominent & Clear) */}
-              <div 
-                onClick={() => {
-                  setVerifiedBySeller(!verifiedBySeller);
-                  setValidationError('');
-                }}
-                className={`p-3.5 rounded-xl border-2 cursor-pointer transition flex items-start gap-3 select-none ${
-                  verifiedBySeller
-                    ? 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-500 text-slate-900 dark:text-white shadow-sm'
-                    : 'bg-rose-50 dark:bg-rose-950/20 border-rose-300 dark:border-rose-800 text-rose-900 dark:text-rose-200 animate-pulse'
-                }`}
-              >
-                <div className="mt-0.5 shrink-0 text-emerald-600 dark:text-emerald-400">
-                  {verifiedBySeller ? (
-                    <CheckSquare className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                  ) : (
-                    <Square className="w-5 h-5 text-rose-500" />
-                  )}
+              {/* PASO 5 OBLIGATORIO: CERTIFICACIÓN VISUAL DESTACADA */}
+              <div className="pt-1">
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs font-extrabold uppercase tracking-wider flex items-center gap-1.5 text-amber-700 dark:text-amber-400">
+                    <ShieldCheck className="w-4 h-4 text-amber-600" />
+                    <span>5. Certificación Obligatoria de Auditoría (KPI L3)</span>
+                  </label>
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                    verifiedBySeller 
+                      ? 'bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border border-emerald-300' 
+                      : 'bg-amber-100 dark:bg-amber-950/50 text-amber-800 dark:text-amber-300 border border-amber-300 animate-pulse'
+                  }`}>
+                    {verifiedBySeller ? '✓ Certificado' : '⚠ Clic Requerido para Activar'}
+                  </span>
                 </div>
-                <div className="text-xs leading-snug">
-                  <strong className={verifiedBySeller ? "text-emerald-800 dark:text-emerald-300 font-bold" : "text-rose-800 dark:text-rose-300 font-bold"}>
-                    {verifiedBySeller ? "✓ Certificación de Fuente Real Activada:" : "⚠ Requiere Certificación (Haz clic aquí):"}
-                  </strong>
-                  <p className="mt-0.5 text-slate-700 dark:text-gray-200 text-[11px]">
-                    He contrastado este abono contra el reporte real oficial (Yape/Plin Negocio o Voucher POS) y certifico que el dinero ingresó a la cuenta del negocio.
-                  </p>
+
+                {/* Big Interactive Card */}
+                <div 
+                  onClick={() => {
+                    setVerifiedBySeller(!verifiedBySeller);
+                    setValidationError('');
+                  }}
+                  className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 flex items-start gap-3.5 select-none shadow-sm ${
+                    verifiedBySeller
+                      ? 'bg-emerald-50 dark:bg-emerald-950/30 border-emerald-500 text-slate-900 dark:text-white ring-2 ring-emerald-500/20'
+                      : 'bg-amber-50/90 dark:bg-amber-950/30 border-amber-400 dark:border-amber-600 hover:border-amber-500 text-slate-900 dark:text-white ring-2 ring-amber-400/20'
+                  }`}
+                >
+                  <div className="mt-0.5 shrink-0">
+                    {verifiedBySeller ? (
+                      <div className="w-6 h-6 rounded-lg bg-emerald-600 text-white flex items-center justify-center shadow-sm">
+                        <CheckSquare className="w-4 h-4" />
+                      </div>
+                    ) : (
+                      <div className="w-6 h-6 rounded-lg border-2 border-amber-600 dark:border-amber-400 bg-white dark:bg-slate-800 flex items-center justify-center">
+                        <Square className="w-4 h-4 text-transparent" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="text-xs leading-relaxed flex-1">
+                    <p className="font-bold text-sm mb-0.5 text-slate-900 dark:text-white">
+                      {verifiedBySeller 
+                        ? '✓ Certifico la Validación contra Fuente Real (Cumple Regla KPI L3)' 
+                        : 'Haz clic en esta casilla para certificar la validación contra fuente real'}
+                    </p>
+                    <p className="text-slate-600 dark:text-gray-300 text-[11px]">
+                      Doy fe de haber contrastado el ingreso en la cuenta/POS oficial de <strong className="text-slate-800 dark:text-white">Parrilladas El Establo</strong> ({realSource}) y confirmo que la transacción está conciliada (No es una captura de chat).
+                    </p>
+                  </div>
                 </div>
               </div>
 
               {validationError && (
-                <p className="text-xs text-rose-600 dark:text-rose-400 font-bold flex items-center gap-1.5 p-2 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800 rounded-lg">
-                  <AlertTriangle className="w-4 h-4 shrink-0" />
+                <div className="p-3 bg-rose-50 dark:bg-rose-950/40 border-2 border-rose-400 rounded-xl text-xs text-rose-800 dark:text-rose-300 font-bold flex items-center gap-2 animate-bounce">
+                  <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0" />
                   <span>{validationError}</span>
-                </p>
+                </div>
               )}
 
             </div>
@@ -348,10 +373,18 @@ export const ReconciliationModal = ({
           {!isAlreadyPayer && (
             <button
               onClick={handleConfirm}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-md hover:scale-105 active:scale-95 transition"
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold transition shadow-md ${
+                verifiedBySeller
+                  ? 'bg-emerald-600 hover:bg-emerald-700 text-white hover:scale-105 active:scale-95'
+                  : 'bg-amber-600 hover:bg-amber-700 text-white'
+              }`}
             >
-              <CheckCircle2 className="w-4 h-4" />
-              <span>Confirmar Conciliación y Cambiar a PAYER</span>
+              {verifiedBySeller ? <CheckCircle2 className="w-4 h-4" /> : <Lock className="w-4 h-4" />}
+              <span>
+                {verifiedBySeller 
+                  ? 'Confirmar Conciliación y Cambiar a PAYER' 
+                  : 'Completar Paso 5 para Cambiar a PAYER'}
+              </span>
             </button>
           )}
         </div>
