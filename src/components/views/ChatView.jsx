@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { 
-  MessageSquare, 
   Send, 
   Bot, 
   UserCheck, 
@@ -25,7 +24,7 @@ export const ChatView = ({
   const initialMessages = CHAT_HISTORY[currentLead.id] || [];
   const [messages, setMessages] = useState(initialMessages);
   const [inputMessage, setInputMessage] = useState('');
-  const [sendAsClient, setSendAsClient] = useState(false); // false = Negocio, true = Cliente
+  const [sendAsClient, setSendAsClient] = useState(false);
 
   const handleSendMessage = (e) => {
     e?.preventDefault();
@@ -135,10 +134,10 @@ export const ChatView = ({
   };
 
   return (
-    <div className="bg-[#1f2c34] border border-crm-border rounded-2xl overflow-hidden shadow-2xl animate-in fade-in duration-200">
+    <div className="bg-white dark:bg-[#1f2c34] border border-slate-200 dark:border-crm-border rounded-2xl overflow-hidden shadow-soft transition-colors duration-200">
       
-      {/* Header */}
-      <div className="bg-[#121b22] px-5 py-3 border-b border-crm-border/60 flex items-center justify-between">
+      {/* Header (Adapts to Light Mode: #f0f2f5 vs Dark Mode: #121b22) */}
+      <div className="bg-[#f0f2f5] dark:bg-[#121b22] px-5 py-3 border-b border-slate-200 dark:border-crm-border/60 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="relative">
             <img 
@@ -146,14 +145,14 @@ export const ChatView = ({
               alt={currentLead.name} 
               className="w-10 h-10 rounded-full object-cover ring-2 ring-emerald-500" 
             />
-            <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-[#121b22]"></span>
+            <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 rounded-full border-2 border-white dark:border-[#121b22]"></span>
           </div>
           <div>
-            <h3 className="text-sm font-bold text-white leading-snug">{currentLead.name}</h3>
-            <p className="text-[11px] text-[#8696a0] flex items-center gap-1.5 font-mono">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white leading-snug">{currentLead.name}</h3>
+            <p className="text-[11px] text-slate-500 dark:text-[#8696a0] flex items-center gap-1.5 font-mono">
               <span>{currentLead.personal.phone}</span>
               <span>•</span>
-              <span className="text-emerald-400">Chat Oficial WhatsApp</span>
+              <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Chat Oficial WhatsApp</span>
             </p>
           </div>
         </div>
@@ -164,33 +163,33 @@ export const ChatView = ({
             onClick={onToggleAi}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold border transition ${
               isAiActive 
-                ? 'bg-amber-500/20 text-amber-400 border-amber-500/40' 
-                : 'bg-slate-700 text-white border-slate-600'
+                ? 'bg-amber-100 dark:bg-amber-500/20 text-amber-800 dark:text-amber-400 border-amber-300 dark:border-amber-500/40' 
+                : 'bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-white border-slate-300 dark:border-slate-600'
             }`}
           >
-            {isAiActive ? <Bot className="w-4 h-4 animate-bounce" /> : <UserCheck className="w-4 h-4" />}
+            {isAiActive ? <Bot className="w-4 h-4 text-amber-600 dark:text-amber-400" /> : <UserCheck className="w-4 h-4 text-slate-600 dark:text-slate-300" />}
             <span>{isAiActive ? 'IA Respondiendo Automático' : 'Control Manual Vendedor'}</span>
           </button>
         </div>
       </div>
 
       {/* NLP Tags Strip */}
-      <div className="bg-[#182229] px-4 py-2.5 border-b border-crm-border/40 flex items-center justify-between gap-2 overflow-x-auto text-[11px]">
-        <div className="flex items-center gap-1.5 text-amber-400 font-bold shrink-0">
+      <div className="bg-slate-50 dark:bg-[#182229] px-4 py-2 border-b border-slate-200 dark:border-crm-border/40 flex items-center justify-between gap-2 overflow-x-auto text-[11px]">
+        <div className="flex items-center gap-1.5 text-amber-700 dark:text-amber-400 font-bold shrink-0">
           <Sparkles className="w-3.5 h-3.5" />
-          <span>PLN Detectado en esta conversación:</span>
+          <span>PLN Detectado:</span>
         </div>
         <div className="flex items-center gap-1.5 shrink-0">
           {currentLead.preferences.nlpTags.map((t, idx) => (
-            <span key={idx} className="bg-crm-bg/90 text-gray-300 px-2 py-0.5 rounded border border-crm-border text-[10px] font-mono">
+            <span key={idx} className="bg-white dark:bg-crm-bg/90 text-slate-700 dark:text-gray-300 px-2 py-0.5 rounded border border-slate-200 dark:border-crm-border text-[10px] font-mono shadow-soft">
               {t.tag} ({t.confidence})
             </span>
           ))}
         </div>
       </div>
 
-      {/* Chat Messages Body */}
-      <div className="p-4 sm:p-6 space-y-3 bg-[#0b141a]/95 min-h-[350px] max-h-[480px] overflow-y-auto">
+      {/* Chat Messages Body (Authentic WhatsApp Light: #efeae2 / Dark: #0b141a) */}
+      <div className="p-4 sm:p-6 space-y-3 bg-[#efeae2]/50 dark:bg-[#0b141a]/95 min-h-[350px] max-h-[480px] overflow-y-auto">
         {messages.map((msg, index) => {
           const isClient = msg.sender === 'client';
           return (
@@ -199,20 +198,20 @@ export const ChatView = ({
               className={`flex flex-col ${isClient ? 'items-start' : 'items-end'}`}
             >
               <div 
-                className={`max-w-[85%] sm:max-w-[75%] rounded-2xl px-4 py-2.5 text-xs shadow ${
+                className={`max-w-[85%] sm:max-w-[75%] rounded-2xl px-4 py-2 text-xs shadow-soft transition-colors ${
                   isClient 
-                    ? 'bg-[#202c33] text-white rounded-tl-none border border-crm-border/40' 
-                    : 'bg-[#005c4b] text-white rounded-tr-none'
+                    ? 'bg-white dark:bg-[#202c33] text-slate-900 dark:text-white rounded-tl-none border border-slate-200/80 dark:border-crm-border/40' 
+                    : 'bg-[#d9fdd3] dark:bg-[#005c4b] text-slate-900 dark:text-white rounded-tr-none'
                 }`}
               >
-                <div className="text-[10px] font-bold mb-1 flex items-center gap-1">
+                <div className="text-[10px] font-bold mb-0.5 flex items-center gap-1">
                   {isClient ? (
-                    <span className="text-amber-400 flex items-center gap-1">
+                    <span className="text-amber-700 dark:text-amber-400 flex items-center gap-1">
                       <User className="w-3 h-3" />
                       <span>{currentLead.name} (Cliente)</span>
                     </span>
                   ) : (
-                    <span className="text-emerald-300 flex items-center gap-1">
+                    <span className="text-emerald-700 dark:text-emerald-300 flex items-center gap-1">
                       {isAiActive ? <Bot className="w-3 h-3" /> : <UserCheck className="w-3 h-3" />}
                       <span>{isAiActive ? 'Agente IA (El Establo)' : currentLead.assignedSeller}</span>
                     </span>
@@ -222,7 +221,7 @@ export const ChatView = ({
                 <p className="whitespace-pre-line leading-relaxed">{msg.text}</p>
 
                 {msg.plnTag && (
-                  <div className="mt-2 pt-1.5 border-t border-white/10 text-[9px] font-mono text-amber-300 flex items-center justify-between gap-1">
+                  <div className="mt-1.5 pt-1.5 border-t border-black/10 dark:border-white/10 text-[9px] font-mono text-amber-700 dark:text-amber-300 flex items-center justify-between gap-1">
                     <span className="flex items-center gap-1">
                       <Tag className="w-2.5 h-2.5" />
                       <span>{msg.plnTag}</span>
@@ -230,7 +229,7 @@ export const ChatView = ({
                     {msg.detectedOpCode && (
                       <button
                         onClick={onOpenPaymentModal}
-                        className="px-2 py-0.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[9px] flex items-center gap-1 transition"
+                        className="px-2 py-0.5 rounded bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[9px] flex items-center gap-1 transition shadow-sm"
                       >
                         <CheckCircle2 className="w-2.5 h-2.5" />
                         <span>Conciliar Op: {msg.detectedOpCode}</span>
@@ -239,9 +238,9 @@ export const ChatView = ({
                   </div>
                 )}
 
-                <div className="flex items-center justify-end gap-1 mt-1 text-[10px] text-gray-300/70">
+                <div className="flex items-center justify-end gap-1 mt-1 text-[10px] text-slate-500 dark:text-gray-300/70">
                   <span>{msg.time}</span>
-                  {!isClient && <CheckCheck className="w-3.5 h-3.5 text-[#53bdeb]" />}
+                  {!isClient && <CheckCheck className="w-3.5 h-3.5 text-blue-500 dark:text-[#53bdeb]" />}
                 </div>
               </div>
             </div>
@@ -250,13 +249,13 @@ export const ChatView = ({
       </div>
 
       {/* Quick Templates Bar */}
-      <div className="bg-[#182229] px-4 py-2 border-t border-crm-border/40 flex items-center gap-2 overflow-x-auto">
-        <span className="text-[10px] font-bold text-gray-400 uppercase shrink-0">Acciones:</span>
+      <div className="bg-[#f0f2f5] dark:bg-[#182229] px-4 py-2 border-t border-slate-200 dark:border-crm-border/40 flex items-center gap-2 overflow-x-auto">
+        <span className="text-[10px] font-bold text-slate-500 dark:text-gray-400 uppercase shrink-0">Acciones:</span>
         
         {/* BOTÓN CLAVE: Simular respuesta de Diego dando el número de operación */}
         <button
           onClick={simulateClientPayment}
-          className="shrink-0 px-3 py-1 rounded-lg text-xs font-bold bg-amber-600/30 hover:bg-amber-600/50 text-amber-300 border border-amber-500/50 flex items-center gap-1.5 transition shadow-sm"
+          className="shrink-0 px-3 py-1 rounded-lg text-xs font-bold bg-amber-100 dark:bg-amber-600/30 hover:bg-amber-200 dark:hover:bg-amber-600/50 text-amber-900 dark:text-amber-300 border border-amber-300 dark:border-amber-500/50 flex items-center gap-1.5 transition shadow-soft"
           title="Simular que el cliente envía su voucher con número de operación"
         >
           <Smartphone className="w-3.5 h-3.5" />
@@ -265,41 +264,41 @@ export const ChatView = ({
 
         <button
           onClick={sendQuickQuoteInfo}
-          className="shrink-0 px-3 py-1 rounded-lg text-xs bg-[#202c33] hover:bg-[#2a3942] text-gray-200 border border-crm-border/60 flex items-center gap-1.5 transition"
+          className="shrink-0 px-2.5 py-1 rounded-lg text-xs bg-white dark:bg-[#202c33] hover:bg-slate-100 dark:hover:bg-[#2a3942] text-slate-800 dark:text-gray-200 border border-slate-200 dark:border-crm-border/60 flex items-center gap-1.5 transition"
         >
-          <Receipt className="w-3.5 h-3.5 text-amber-400" />
+          <Receipt className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
           <span>Enviar Cotización</span>
         </button>
 
         <button
           onClick={sendQuickPaymentInfo}
-          className="shrink-0 px-3 py-1 rounded-lg text-xs bg-[#202c33] hover:bg-[#2a3942] text-gray-200 border border-crm-border/60 flex items-center gap-1.5 transition"
+          className="shrink-0 px-2.5 py-1 rounded-lg text-xs bg-white dark:bg-[#202c33] hover:bg-slate-100 dark:hover:bg-[#2a3942] text-slate-800 dark:text-gray-200 border border-slate-200 dark:border-crm-border/60 flex items-center gap-1.5 transition"
         >
-          <Wallet className="w-3.5 h-3.5 text-emerald-400" />
+          <Wallet className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
           <span>Instrucciones {currentLead.operational.preferredPaymentMethod}</span>
         </button>
 
         <button
           onClick={onOpenPaymentModal}
-          className="shrink-0 px-3 py-1 rounded-lg text-xs bg-emerald-700/30 hover:bg-emerald-700/50 text-emerald-300 border border-emerald-500/40 flex items-center gap-1.5 transition"
+          className="shrink-0 px-2.5 py-1 rounded-lg text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-semibold flex items-center gap-1.5 transition shadow-soft"
         >
           <CheckCircle2 className="w-3.5 h-3.5" />
-          <span>Conciliar Pago Directo</span>
+          <span>Conciliar Pago</span>
         </button>
       </div>
 
       {/* Input Form with Client/Business Selector */}
-      <form onSubmit={handleSendMessage} className="bg-[#202c33] p-3 border-t border-crm-border/60 flex items-center gap-2">
-        <div className="flex items-center bg-[#121b22] border border-crm-border/60 rounded-xl p-0.5 shrink-0">
+      <form onSubmit={handleSendMessage} className="bg-[#f0f2f5] dark:bg-[#202c33] p-3 border-t border-slate-200 dark:border-crm-border/60 flex items-center gap-2">
+        <div className="flex items-center bg-white dark:bg-[#121b22] border border-slate-200 dark:border-crm-border/60 rounded-xl p-0.5 shrink-0 shadow-soft">
           <button
             type="button"
             onClick={() => setSendAsClient(true)}
             className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition flex items-center gap-1 ${
               sendAsClient 
                 ? 'bg-amber-600 text-white shadow-sm' 
-                : 'text-gray-400 hover:text-white'
+                : 'text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white'
             }`}
-            title="Escribir como el Cliente (Diego Alonso)"
+            title="Escribir como el Cliente"
           >
             <User className="w-3 h-3" />
             <span>Cliente</span>
@@ -309,8 +308,8 @@ export const ChatView = ({
             onClick={() => setSendAsClient(false)}
             className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition flex items-center gap-1 ${
               !sendAsClient 
-                ? 'bg-emerald-700 text-white shadow-sm' 
-                : 'text-gray-400 hover:text-white'
+                ? 'bg-emerald-600 text-white shadow-sm' 
+                : 'text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white'
             }`}
             title="Escribir como Parrilladas El Establo"
           >
@@ -328,12 +327,12 @@ export const ChatView = ({
               ? `Escribe como ${currentLead.name.split(' ')[0]} (ej. "Ya yapeé, mi número de operación es 83921045")...` 
               : (isAiActive ? "Escribe para intervenir manualmente como vendedor..." : "Escribe un mensaje como vendedor...")
           }
-          className="flex-1 bg-[#2a3942] text-xs text-white placeholder-gray-400 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+          className="flex-1 bg-white dark:bg-[#2a3942] text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-gray-400 rounded-xl px-4 py-2 border border-slate-200 dark:border-transparent focus:outline-none focus:ring-1 focus:ring-emerald-500 shadow-soft"
         />
         
         <button
           type="submit"
-          className={`p-2.5 rounded-xl text-white transition hover:scale-105 active:scale-95 ${
+          className={`p-2 rounded-xl text-white transition hover:scale-105 active:scale-95 shadow-soft ${
             sendAsClient ? 'bg-amber-600 hover:bg-amber-500' : 'bg-emerald-600 hover:bg-emerald-500'
           }`}
           title="Enviar mensaje"
