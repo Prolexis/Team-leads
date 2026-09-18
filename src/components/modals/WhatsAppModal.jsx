@@ -15,6 +15,15 @@ import {
 } from 'lucide-react';
 import { CHAT_HISTORY } from '../../types/crmData';
 
+const getStoredMessages = (leadId) => {
+  const stored = sessionStorage.getItem(`chat_${leadId}`);
+  return stored ? JSON.parse(stored) : (CHAT_HISTORY[leadId] || []);
+};
+
+const saveMessages = (leadId, msgs) => {
+  sessionStorage.setItem(`chat_${leadId}`, JSON.stringify(msgs));
+};
+
 export const WhatsAppModal = ({ 
   isOpen, 
   onClose, 
@@ -24,12 +33,11 @@ export const WhatsAppModal = ({
   onOpenQuoteModal,
   onOpenPaymentModal 
 }) => {
-  if (!isOpen) return null;
-
-  const initialMessages = CHAT_HISTORY[currentLead.id] || [];
-  const [messages, setMessages] = useState(initialMessages);
+  const [messages, setMessages] = useState(() => getStoredMessages(currentLead.id));
   const [inputMessage, setInputMessage] = useState('');
   const [sendAsClient, setSendAsClient] = useState(false);
+
+  if (!isOpen) return null;
 
   const handleSendMessage = (e) => {
     e?.preventDefault();
@@ -44,7 +52,9 @@ export const WhatsAppModal = ({
       text: clientText
     };
 
-    setMessages([...messages, newMsg]);
+    const updated = [...messages, newMsg];
+    setMessages(updated);
+    saveMessages(currentLead.id, updated);
     setInputMessage('');
 
     if (isFromClient) {
@@ -55,16 +65,20 @@ export const WhatsAppModal = ({
           const match = clientText.match(/\b\d{6,10}\b/);
           const opCode = match ? match[0] : '83921045';
           
-          setMessages((prev) => [
-            ...prev,
-            {
-              sender: 'ai',
-              time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-              text: `¡Excelente ${currentLead.name.split(' ')[0]}! 🥩 Hemos recibido tu notificación de pago con Nº de Operación *${opCode}*. \n\nEstamos contrastando el abono en nuestra cuenta oficial de ${currentLead.operational.preferredPaymentMethod} Negocios para cambiar tu pedido a *PAYER* y emitir tu comprobante. 🔥`,
-              plnTag: `PLN: PAGO_DETECTADO (Op: ${opCode})`,
-              detectedOpCode: opCode
-            }
-          ]);
+          setMessages((prev) => {
+            const newPrev = [
+              ...prev,
+              {
+                sender: 'ai',
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                text: `¡Excelente ${currentLead.name.split(' ')[0]}! 🥩 Hemos recibido tu notificación de pago con Nº de Operación *${opCode}*. \n\nEstamos contrastando el abono en nuestra cuenta oficial de ${currentLead.operational.preferredPaymentMethod} Negocios para cambiar tu pedido a *PAYER* y emitir tu comprobante. 🔥`,
+                plnTag: `PLN: PAGO_DETECTADO (Op: ${opCode})`,
+                detectedOpCode: opCode
+              }
+            ];
+            saveMessages(currentLead.id, newPrev);
+            return newPrev;
+          });
         }
       }, 1000);
     }
@@ -81,19 +95,27 @@ export const WhatsAppModal = ({
       text: `Listo, ya realicé el ${method} por S/ ${amount}. Mi número de operación es *${opCode}*. Por favor confírmame para coordinar la entrega en mi hora de almuerzo.`
     };
 
-    setMessages((prev) => [...prev, clientMsg]);
+    setMessages((prev) => {
+      const newPrev = [...prev, clientMsg];
+      saveMessages(currentLead.id, newPrev);
+      return newPrev;
+    });
 
     setTimeout(() => {
-      setMessages((prev) => [
-        ...prev,
-        {
-          sender: 'ai',
-          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-          text: `¡Perfecto ${currentLead.name.split(' ')[0]}! 🥩 El Agente IA ha detectado tu constancia con el Nº de Operación *${opCode}* vía PLN.\n\nProcediendo a la conciliación contra fuente real en Caja para emitir tu ${currentLead.work.requiresInvoice ? `Factura RUC: ${currentLead.work.ruc}` : 'Boleta Electrónica'} y cambiar tu estado a *PAYER*. 🔥`,
-          plnTag: `PLN: OP_BANCARIA_VALIDA (Nº ${opCode})`,
-          detectedOpCode: opCode
-        }
-      ]);
+      setMessages((prev) => {
+        const newPrev = [
+          ...prev,
+          {
+            sender: 'ai',
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            text: `¡Perfecto ${currentLead.name.split(' ')[0]}! 🥩 El Agente IA ha detectado tu constancia con el Nº de Operación *${opCode}* vía PLN.\n\nProcediendo a la conciliación contra fuente real en Caja para emitir tu ${currentLead.work.requiresInvoice ? `Factura RUC: ${currentLead.work.ruc}` : 'Boleta Electrónica'} y cambiar tu estado a *PAYER*. 🔥`,
+            plnTag: `PLN: OP_BANCARIA_VALIDA (Nº ${opCode})`,
+            detectedOpCode: opCode
+          }
+        ];
+        saveMessages(currentLead.id, newPrev);
+        return newPrev;
+      });
     }, 1200);
   };
 
@@ -111,14 +133,18 @@ export const WhatsAppModal = ({
     }
     paymentMsg += `\n⚠️ *Nota de seguridad:* Por favor indica tu número de operación para validar en sistema y emitir tu comprobante.`;
 
-    setMessages((prev) => [
-      ...prev,
-      {
-        sender: isAiActive ? 'ai' : 'seller',
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        text: paymentMsg
-      }
-    ]);
+    setMessages((prev) => {
+      const newPrev = [
+        ...prev,
+        {
+          sender: isAiActive ? 'ai' : 'seller',
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          text: paymentMsg
+        }
+      ];
+      saveMessages(currentLead.id, newPrev);
+      return newPrev;
+    });
   };
 
   const sendQuickQuoteInfo = () => {
@@ -131,14 +157,18 @@ export const WhatsAppModal = ({
     quoteMsg += `Total: *S/ 53.00* (Delivery a ${currentLead.personal.district})\n`;
     quoteMsg += `⏱️ *Cupo bloqueado por 20 minutos.*`;
 
-    setMessages((prev) => [
-      ...prev,
-      {
-        sender: isAiActive ? 'ai' : 'seller',
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        text: quoteMsg
-      }
-    ]);
+    setMessages((prev) => {
+      const newPrev = [
+        ...prev,
+        {
+          sender: isAiActive ? 'ai' : 'seller',
+          time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          text: quoteMsg
+        }
+      ];
+      saveMessages(currentLead.id, newPrev);
+      return newPrev;
+    });
   };
 
   return (
